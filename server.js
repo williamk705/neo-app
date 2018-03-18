@@ -3,9 +3,9 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
-const passport = require('passport');
 const cookieParser = require('cookie-parser');
-const session = require('express-session')
+const MongoClient = require('mongodb').MongoClient;
+const mongo = require('./server/database/connect');
 // Get our API routes
 const api = require('./server/routes/api');
 
@@ -17,9 +17,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Other
 app.use(cookieParser());
-app.use(session({secret: 'putthissecretkeyinafileorenvironmentvariablethanks'}));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Point static path to dist
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -29,7 +26,7 @@ app.use('/api', api);
 
 // Catch all other routes and return the index file
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/index.html'));
+	res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
 /**
@@ -46,4 +43,10 @@ const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(port, () => console.log(`API running on localhost:${port}`));
+
+ // Connect to mongodb on init
+mongo.connect((err) => {
+	app.locals._db = mongo.getDb();
+	console.log('[MongoDB] connection established');
+	server.listen(port, () => console.log(`API running on localhost:${port}`));
+});

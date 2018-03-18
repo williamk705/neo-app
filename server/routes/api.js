@@ -1,13 +1,17 @@
 const express = require('express');
 const router = express.Router();
-
+const MongoClient = require('mongodb').MongoClient;
+const mongo = require('../database/connect');
+const _db = mongo.getDb();
 // declare axios for making http requests
 const axios = require('axios');
-const API = 'https://jsonplaceholder.typicode.com';
 
 /* GET api listing. */
 router.get('/', (req, res) => {
-  res.send('api works');
+  let db = res.app.locals._db;
+    db.collection('users').find({}).toArray((err, result) => {
+    res.send(result);
+  });
 });
 
 // Get all posts
