@@ -20,13 +20,20 @@ app.use(cookieParser());
 
 // Point static path to dist
 app.use(express.static(path.join(__dirname, 'dist')));
-
+app.use(express.static(path.join(__dirname, 'landing')));
+app.get('/login', (req, res) => {
+	res.sendFile(path.join(__dirname, 'landing/landing-page.html/'));
+});
 // Set our api routes
 app.use('/api', api);
 
+app.get('/dashboard', (req, res) => {
+	res.sendFile(path.join(__dirname, 'dist/neo-app.html/'));
+})
+
 // Catch all other routes and return the index file
 app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname, 'dist/index.html/'));
+	res.redirect('/login');
 });
 
 /**
